@@ -21,22 +21,28 @@ Packages required:
 
 ## TODO
 
-List of desired features:
+List of desired features for the FDTD solver
 
-* engine
-    1. Working 2D solver (TE/TM)
-    1. Absorbing boundaries (PML)
-    1. Dielectrics (arbitrary refractive index)
-    1. Metals (Drude model) (default materials)
-    1. Two level systems (?)
-    1. TFSF source
-    1. ...
-* GUI and data presentation
-    1. Real time field animation
-    1. Easy geometry definition
-    1. Real time (?) DFT/FFT
-    1. Real time envelope extraction (Hilbert transform)
-    1. ...
+1. Working 2D solver (TE/TM)
+1. Boundaries
+    * Absorbing boundaries (PML)
+    * Reflecting boundaries (PEC)
+1. Sources
+    * Dipolar additive source
+    * TFSF box
+1. Materials
+    * Dielectrics (arbitrary `n`)
+    * Metals (Drude model)
+    * Two level system (?)
+1. ...
+
+and the GUI and data analysis/presentation
+
+1. Real time field animation
+1. Easy geometry definition
+1. Real time (?) DFT/FFT
+1. Real time envelope extraction (Hilbert transform)
+1. ...
 
 This looks ambitious!
 
