@@ -9,7 +9,8 @@ have a good teaching impact.
 
 It has the following features:
 
-* Fill me in, please :(
+* Additive source at arbitrary position
+* Reflective boundaries through perfect electric conductor (PEL)
 
 ## Dependencies
 
@@ -23,12 +24,12 @@ Packages required:
 
 List of desired features for the FDTD solver
 
-1. Working 2D solver (TE/TM)
+1. Working 2D solver (TE/~~TM~~)
 1. Boundaries
     * Absorbing boundaries (PML)
-    * Reflecting boundaries (PEC)
+    * ~~Reflecting boundaries (PEC)~~
 1. Sources
-    * Dipolar additive source
+    * ~~Dipolar additive source~~
     * TFSF box
 1. Materials
     * Dielectrics (arbitrary `n`)
