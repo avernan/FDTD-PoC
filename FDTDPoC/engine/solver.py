@@ -27,6 +27,7 @@ class Grid(object):
         self._shape = (sizex, sizey)
         self._shape_x = (sizex, sizey - 1)
         self._shape_y = (sizex - 1, sizey)
+        self._sources = []
 
         # z component of the field. For TE this is an electric field
         self._Fz = Field(self._shape, field="E", comp=2)
@@ -55,20 +56,31 @@ class Grid(object):
         except TypeError:
             return getattr(self, "_F" + comp)
 
-    def step(self, i, src=(1, 1, 0)):
+    def add_source(self, source):
         """
-        Perform one FDTDPoC step, i.e., one electric field update and one magnetic field update on the
-        whole grid
-        :param i: index of the step
+        Add a source to the simulation
+        :param source: object of type source
+        :return: NoneType
+        """
+        self._sources.append(source)
+        return
+
+    def step(self, t):
+        """
+        Perform one FDTDPoC step, i.e., one electric field update and one magnetic field update on
+        the whole grid
+        :param t: index of the step
         :param src: a tuple indicating position and field for the source
         :return: NoneType
         """
-        self._time = i
-        self._Fx.step(i, self._Fz)
-        self._Fy.step(i, self._Fz)
-        self._Fz.step(i, self._Fx, self._Fy)
+        self._time = t
+        self._Fx.step(t, self._Fz)
+        self._Fy.step(t, self._Fz)
+        self._Fz.step(t, self._Fx, self._Fy)
 
-        self._Fz._data[src[0],src[1]] += src[2]
+        for so in self._sources:
+            pos = so.get_position()
+            self._Fz._data[pos[0],pos[1]] += so(t)
         return
 
 
