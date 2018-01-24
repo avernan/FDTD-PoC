@@ -30,7 +30,9 @@ ax = plt.axes(xlim=(-100,300.5), ylim=(-0.5,300.5))
 ax.set_aspect('equal')
 
 data = g.get_field(2)._data
+data = numpy.array(list(map(lambda x: 0*x+1e-10, data))) # TODO: clean this mess up
 im = ax.imshow(numpy.abs(data), cmap=plt.get_cmap('jet'), norm=LogNorm(vmin=1e-4, vmax=2, clip=True))
+g.get_field(2)._data = data
 cbar = plt.colorbar(im, ax=ax)
 
 text0 = ax.text(5,90, "f={:4d}".format(0))
