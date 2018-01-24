@@ -1,11 +1,12 @@
 # Simple driver implementation, whose main purpose is testing.
 
-import numpy
-import matplotlib.pyplot as plt
+import engine.solver as FDTD
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy
 from matplotlib.colors import LogNorm
-import FDTDPoC.engine.solver as FDTD
-import FDTDPoC.engine.sources as sources
+
+import engine.sources as sources
 
 g = FDTD.Grid(301,301)
 for i in range(5):
@@ -25,7 +26,7 @@ for i in range(5):
     )
 
 fig = plt.figure()
-ax = plt.axes(xlim=(-0.5,300.5), ylim=(-0.5,300.5))
+ax = plt.axes(xlim=(-100,300.5), ylim=(-0.5,300.5))
 ax.set_aspect('equal')
 
 data = g.get_field(2)._data
