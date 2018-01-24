@@ -26,7 +26,9 @@ for i in range(5):
     )
 
 fig = plt.figure()
-ax = plt.axes(xlim=(-100,300.5), ylim=(-0.5,300.5))
+plt.subplots_adjust(top=0.8)
+ax = plt.axes(xlim=(0.5,300.5), ylim=(-0.5,300.5))
+ax = plt.axes(xlim=(-0.5,300.5), ylim=(-0.5,300.5))
 ax.set_aspect('equal')
 
 data = g.get_field(2)._data
@@ -35,7 +37,7 @@ im = ax.imshow(numpy.abs(data), cmap=plt.get_cmap('jet'), norm=LogNorm(vmin=1e-4
 g.get_field(2)._data = data
 cbar = plt.colorbar(im, ax=ax)
 
-text0 = ax.text(5,90, "f={:4d}".format(0))
+text0 = ax.text(150,340, "frame {:4d}".format(0), horizontalalignment="center")
 text0.set_color('r')
 text0.set_fontsize(20)
 
@@ -48,7 +50,7 @@ def update(i):
     g.step(i)
     data = g.get_field(2)._data
     im.set_data(numpy.abs(data))
-    text0.set_text("f={:4d}".format(i))
+    text0.set_text("frame {:4d}".format(i))
     return [im, text0]
 
 anim = animation.FuncAnimation(
