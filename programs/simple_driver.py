@@ -58,7 +58,7 @@ anim = animation.FuncAnimation(
     frames=800,
     repeat=False,
     interval=int(1000/30),
-    blit=True
+    blit=False
 )
 
 plt.show()
