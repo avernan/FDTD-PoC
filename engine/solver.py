@@ -7,7 +7,6 @@
 
 import numpy
 
-
 class Grid(object):
     """
     Main class to store a simulated system.
@@ -28,9 +27,10 @@ class Grid(object):
         self._shape_x = (sizex, sizey - 1)
         self._shape_y = (sizex - 1, sizey)
         self._sources = []
+        self._bounds = {}
 
         # z component of the field. For TE this is an electric field
-        self._Fz = Field(self._shape, field="E", comp=2)
+        self._Fz = Field(self._shape, field="E", comp=2, bounds=self._bounds)
         # x,y components of the field. These are magnetic fields
         self._Fx = Field(self._shape_x, field="H", comp=0)
         self._Fy = Field(self._shape_y, field="H", comp=1)
@@ -65,6 +65,11 @@ class Grid(object):
         self._sources.append(source)
         return
 
+    def set_boundaries(self, **kwargs):
+        for k, v in kwargs.items():
+            if k in ['xp', 'xm', 'yp', 'ym']:
+                self._bounds[k] = v
+
     def build(self):
         if len(self._bounds) != 4:
             raise Exception("Grid should have one boundary defined for every side")
@@ -94,16 +99,18 @@ class Field(object):
     """
     Class that represents a single field component over the whole grid or a subset of it
     """
-    def __init__(self, shape, field, comp):
+    def __init__(self, shape, field, comp, bounds=None):
         """
         Create an object representing a field component over the grid or a subset of the grid
         :param shape: tuple representing the number of points along x and y
         :param field: electric or magnetic field
         :param comp: x, y, or z component
+        :param bounds: dictionary of boundaries on the four edges
         """
         self._shape = shape
         self._field = field
         self._comp = comp
+        self._bounds = bounds
         self._data = numpy.zeros(self._shape, dtype="double")
 
     def step(self, i, *other):
@@ -122,4 +129,8 @@ class Field(object):
                 - Grid.C * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
                 + Grid.C * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
             )
+            self._data[0,:] = self._bounds['xm']()
+            self._data[-1,:] = self._bounds['xp']()
+            self._data[:,0] = self._bounds['ym']()
+            self._data[:,-1] = self._bounds['yp']()
         return

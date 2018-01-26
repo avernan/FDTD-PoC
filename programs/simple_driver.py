@@ -5,6 +5,7 @@ import engine.solver as FDTD
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy
+import engine.boundaries as bounds
 from matplotlib.colors import LogNorm
 
 import engine.sources as sources
@@ -26,6 +27,7 @@ for i in range(5):
         )
     )
 
+g.set_boundaries(xm=bounds.PEC(), xp=bounds.PEC(), ym=bounds.PEC(), yp=bounds.PEC())
 g.build()
 
 fig = plt.figure()
