@@ -1,6 +1,6 @@
 # FDTD-PoC
-A minimal FDTDPoC proof of concept.
-The aim of the project is to implement a simple FDTDPoC solver in python3,
+A minimal FDTD proof of concept (FDTDPoC).
+The aim of the project is to implement a simple FDTD solver in python3,
 and use it to help people familiriarize with the workings of the
 algorithm. To this aim, the solver should work in 2D (for TE and/or TM
 polarisations) and allow for easy configuration of a TFSF plane wave

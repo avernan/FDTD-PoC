@@ -78,7 +78,7 @@ class Grid(object):
 
     def __step(self, t):
         """
-        Perform one FDTDPoC step, i.e., one electric field update and one magnetic field update on
+        Perform one FDTD step, i.e., one electric field update and one magnetic field update on
         the whole grid
         :param t: index of the step
         :param src: a tuple indicating position and field for the source
