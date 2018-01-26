@@ -65,7 +65,13 @@ class Grid(object):
         self._sources.append(source)
         return
 
-    def step(self, t):
+    def build(self):
+        if len(self._bounds) != 4:
+            raise Exception("Grid should have one boundary defined for every side")
+        self._built = True
+        self.step = self.__step
+
+    def __step(self, t):
         """
         Perform one FDTDPoC step, i.e., one electric field update and one magnetic field update on
         the whole grid

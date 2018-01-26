@@ -26,6 +26,8 @@ for i in range(5):
         )
     )
 
+g.build()
+
 fig = plt.figure()
 plt.subplots_adjust(top=0.8)
 ax = plt.axes(xlim=(-0.5,300.5), ylim=(-0.5,300.5))
