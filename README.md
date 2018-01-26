@@ -9,8 +9,9 @@ have a good teaching impact.
 
 It has the following features:
 
-* Additive source at arbitrary position
-* Reflective boundaries through perfect electric conductor (PEL)
+* Additive dipolar sources can be added at arbitrary positions
+    * An independent `pulse` component representing the time dependence of the source
+* Reflective boundaries through perfect electric conductor (PEC)
 
 ## Dependencies
 
@@ -18,6 +19,9 @@ The code has been written on Linux (Ubuntu 17.10) using python3.
 Packages required:
 
 * `numpy`
+
+Packages required to run the test driver:
+
 * `matplotlib`
 
 ## TODO
@@ -26,7 +30,7 @@ List of desired features for the FDTD solver
 
 1. Working 2D solver (TE/~~TM~~)
 1. Boundaries
-    * Absorbing boundaries (PML)
+    * Absorbing boundaries (ABC/PML)
     * ~~Reflecting boundaries (PEC)~~
 1. Sources
     * ~~Dipolar additive source~~
