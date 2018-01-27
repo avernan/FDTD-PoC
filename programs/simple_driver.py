@@ -43,6 +43,7 @@ ax = plt.axes(xlim=(-0.5,shape[0]-0.5), ylim=(-0.5,shape[1]-0.5))
 ax.set_aspect('equal')
 
 data = g.get_field(2)._data
+# TODO: smaller value of `vmin` is required to hide ABC reflection on log scale
 im = ax.imshow(numpy.abs(numpy.transpose(data)), cmap=plt.get_cmap('inferno'), norm=SafeLogNorm(vmin=1e-6, vmax=2, clip=True))
 cbar = plt.colorbar(im, ax=ax)
 
