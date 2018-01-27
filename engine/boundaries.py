@@ -34,18 +34,17 @@ class ABC(Boundary):
 
     def build_boundary(self, **kwargs):
         self._auxfield = [numpy.zeros((3,kwargs["size"]))] * 2
+        self._realfield = kwargs['field']
         return self
 
-    # TODO: extend for y+- and x+ boundaries
     def __call__(self, *args):
-        assert len(args) == 1
-        field = args[0]
+        assert len(args) == 0
         update = (
-            self._coef0 * (field[2,:] + self._auxfield[1][0,:]) +
-            self._coef1 * (self._auxfield[0][0,:] + self._auxfield[0][2,:] - field[1,:] - self._auxfield[1][1,:]) +
+            self._coef0 * (self._realfield[2,:] + self._auxfield[1][0,:]) +
+            self._coef1 * (self._auxfield[0][0,:] + self._auxfield[0][2,:] - self._realfield[1,:] - self._auxfield[1][1,:]) +
             self._coef2 * self._auxfield[0][1,:] -
             self._auxfield[1][2,:]
         )
         self._auxfield.pop()
-        self._auxfield.insert(0, numpy.array([update, field[1,:], field[2,:]]))
+        self._auxfield.insert(0, numpy.array([update, self._realfield[1,:], self._realfield[2,:]]))
         return update
