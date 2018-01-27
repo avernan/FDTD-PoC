@@ -49,9 +49,10 @@ text0.set_verticalalignment("top")
 text0.set_color('r')
 text0.set_fontsize(16)
 
+# TODO: should avoid transposing data every time. Too easy to forget
 def init():
     data = g.get_field(2)._data
-    im.set_data(numpy.abs(data))
+    im.set_data(numpy.abs(numpy.transpose(data)))
     return [im]
 
 def update(i):
@@ -65,7 +66,7 @@ def update(i):
     elaps_gen.pop(0)
     elaps_gen.append(to_msec(time[1] - time[0]))
     data = g.get_field(2)._data
-    im.set_data(numpy.abs(data))
+    im.set_data(numpy.abs(numpy.transpose(data)))
     text0.set_text(txt.format(
         i,
         sum(elaps_gen)/len(elaps_gen),
