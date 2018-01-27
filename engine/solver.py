@@ -12,6 +12,7 @@ class Grid(object):
     Main class to store a simulated system.
     """
     comps = 'xyz'
+    sides = {'x': 1, 'y': 0}
     C = 1 / numpy.math.sqrt(2)
     Z0 = 377.0
 
@@ -69,7 +70,9 @@ class Grid(object):
     def set_boundaries(self, **kwargs):
         for k, v in kwargs.items():
             if k in ['xp', 'xm', 'yp', 'ym']:
-                self._bounds[k] = v
+                self._bounds[k] = v.build_boundary(
+                        size=self._shape[Grid.sides[k[0]]]
+                        )
 
     def build(self):
         if len(self._bounds) != 4:
