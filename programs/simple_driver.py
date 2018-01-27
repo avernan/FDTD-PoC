@@ -14,7 +14,14 @@ class SafeLogNorm(LogNorm):
     def __call__(self, value, clip=None):
         return LogNorm.__call__(self, value + 1e-20, clip)
 
-    eff = 0.5
+shape = (301, 301)
+eff = 0.5
+
+g = FDTD.Grid(*shape)
+
+for i in range(5):
+    pos = numpy.array(shape) * numpy.random.random(2)
+    parms = numpy.random.random(4)
     g.add_source(
         sources.SourceDipole(
             (int(pos[0]), int(pos[1])),
