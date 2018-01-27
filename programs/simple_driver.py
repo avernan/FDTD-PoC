@@ -10,10 +10,10 @@ from matplotlib.colors import LogNorm
 
 import engine.sources as sources
 
-g = FDTD.Grid(301,301)
-for i in range(5):
-    pos = numpy.random.random(2)*300
-    parms = 2*(numpy.random.random(4) - 0.5)
+class SafeLogNorm(LogNorm):
+    def __call__(self, value, clip=None):
+        return LogNorm.__call__(self, value + 1e-20, clip)
+
     eff = 0.5
     g.add_source(
         sources.SourceDipole(
@@ -36,9 +36,7 @@ ax = plt.axes(xlim=(-0.5,300.5), ylim=(-0.5,300.5))
 ax.set_aspect('equal')
 
 data = g.get_field(2)._data
-data = numpy.array(list(map(lambda x: 0*x+1e-10, data))) # TODO: clean this mess up
-im = ax.imshow(numpy.abs(data), cmap=plt.get_cmap('jet'), norm=LogNorm(vmin=1e-4, vmax=2, clip=True))
-g.get_field(2)._data = data
+im = ax.imshow(numpy.abs(numpy.transpose(data)), cmap=plt.get_cmap('inferno'), norm=SafeLogNorm(vmin=1e-6, vmax=2, clip=True))
 cbar = plt.colorbar(im, ax=ax)
 
 time = [dt.now(), dt.now()]
