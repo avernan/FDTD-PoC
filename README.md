@@ -12,6 +12,7 @@ It has the following features:
 * Additive dipolar sources can be added at arbitrary positions
     * An independent `pulse` component representing the time dependence of the source
 * Reflective boundaries through perfect electric conductor (PEC)
+* Absorptive (i.e. open system) boundaries through absorbing boundary conditions (ABC)
 
 ## Dependencies
 
@@ -30,7 +31,7 @@ List of desired features for the FDTD solver
 
 1. Working 2D solver (TE/~~TM~~)
 1. Boundaries
-    * Absorbing boundaries (ABC/PML)
+    * Absorbing boundaries (~~ABC~~/PML)
     * ~~Reflecting boundaries (PEC)~~
 1. Sources
     * ~~Dipolar additive source~~
