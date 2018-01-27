@@ -13,6 +13,7 @@ class Grid(object):
     """
     comps = 'xyz'
     C = 1 / numpy.math.sqrt(2)
+    Z0 = 377.0
 
     def __init__(self, sizex=101, sizey=101):
         """
@@ -121,13 +122,13 @@ class Field(object):
         :return: NoneType
         """
         if self._comp == 0:
-            self._data = self._data - Grid.C * (other[0]._data[:,1:] - other[0]._data[:,:-1])
+            self._data = self._data - Grid.C / Grid.Z0 * (other[0]._data[:,1:] - other[0]._data[:,:-1])
         elif self._comp == 1:
-            self._data = self._data + Grid.C * (other[0]._data[1:,:] - other[0]._data[:-1,:])
+            self._data = self._data + Grid.C / Grid.Z0 * (other[0]._data[1:,:] - other[0]._data[:-1,:])
         elif self._comp == 2:
             self._data[1:-1, 1:-1] = self._data[1:-1, 1:-1] + (
-                - Grid.C * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
-                + Grid.C * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
+                - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
+                + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
             )
             self._data[0,:] = self._bounds['xm']()
             self._data[-1,:] = self._bounds['xp']()
