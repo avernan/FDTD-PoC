@@ -133,8 +133,8 @@ class Field(object):
                 - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
                 + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
             )
-            self._data[0,:] = self._bounds['xm']()
-            self._data[-1,:] = self._bounds['xp']()
-            self._data[:,0] = self._bounds['ym']()
-            self._data[:,-1] = self._bounds['yp']()
+            self._data[0,:] = self._bounds['xm'](self._data)
+            self._data[-1,:] = self._bounds['xp'](self._data)
+            self._data[:,0] = self._bounds['ym'](self._data)
+            self._data[:,-1] = self._bounds['yp'](self._data)
         return

@@ -8,7 +8,7 @@ class Boundary(object):
     def build_boundary(self, **kwargs):
         return self
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args):
         raise NotImplementedError
 
 class PEC(Boundary):
@@ -16,7 +16,7 @@ class PEC(Boundary):
     Perfect Electric Conductor (PEC) boundary.
     Perfectly reflecting boundary obtained by forcing the terminating E node to zero
     """
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args):
         return 0
 
 class ABC(Boundary):
@@ -37,7 +37,7 @@ class ABC(Boundary):
         return self
 
     # TODO: extend for y+- and x+ boundaries
-    def __call__(self, *args, **kwargs):
+    def __call__(self, *args):
         assert len(args) == 1
         field = args[0]
         update = (
