@@ -12,6 +12,7 @@ class Grid(object):
     Main class to store a simulated system.
     """
     comps = 'xyz'
+    sides = {'x': 1, 'y': 0}
     C = 1 / numpy.math.sqrt(2)
     Z0 = 377.0
 
@@ -67,9 +68,19 @@ class Grid(object):
         return
 
     def set_boundaries(self, **kwargs):
+        # TODO: cleaner implementation required:
+        #   * this should only transpose and/or reverse arrays as different boundary types may require different number
+        #   of layers
+        #   * the dictionary implementation is confusing and difficult to handle/expand
         for k, v in kwargs.items():
-            if k in ['xp', 'xm', 'yp', 'ym']:
-                self._bounds[k] = v
+            self._bounds[k] = v.build_boundary(
+                **{
+                    'xm': {'size': self._shape[1], 'field': self._Fz._data[0:3,:]},
+                    'xp': {'size': self._shape[1], 'field': self._Fz._data[-1:-4:-1,:]},
+                    'ym': {'size': self._shape[0], 'field': numpy.transpose(self._Fz._data[:,0:3])},
+                    'yp': {'size': self._shape[0], 'field': numpy.transpose(self._Fz._data[:,-1:-4:-1])}
+                }[k]
+            )
 
     def build(self):
         if len(self._bounds) != 4:
