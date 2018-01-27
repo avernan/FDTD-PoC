@@ -39,7 +39,7 @@ g.build()
 
 fig = plt.figure()
 plt.subplots_adjust(top=0.8)
-ax = plt.axes(xlim=(-0.5,300.5), ylim=(-0.5,300.5))
+ax = plt.axes(xlim=(-0.5,shape[0]-0.5), ylim=(-0.5,shape[1]-0.5))
 ax.set_aspect('equal')
 
 data = g.get_field(2)._data
@@ -50,7 +50,7 @@ time = [dt.now(), dt.now()]
 elaps_gen = [0] * 50
 elaps_rend = [0] * 50
 txt = "frame {:4d}\nTimes: {:.2f} ms (gen.), {:.2f} ms (rend.)\nFPS: {:.1f}"
-text0 = ax.text(150,370, txt.format(0, sum(elaps_gen)/len(elaps_gen), sum(elaps_rend)/len(elaps_rend), 0))
+text0 = ax.text(int(shape[0]/2),int(shape[1]*1.20), txt.format(0, sum(elaps_gen)/len(elaps_gen), sum(elaps_rend)/len(elaps_rend), 0))
 text0.set_horizontalalignment("center")
 text0.set_verticalalignment("top")
 text0.set_color('r')
