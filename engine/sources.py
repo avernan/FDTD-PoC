@@ -1,7 +1,18 @@
 import numpy
 
 
-class SourceDipole(object):
+class Source(object):
+    def __call__(self, *args, **kwargs):
+        return float(0)
+
+    def get_position(self):
+        return (0,0)
+
+    def update(self):
+        return
+
+
+class SourceDipole(Source):
     """
     Dipole (additive) sources with arbitrary position and pulse shape
     """
@@ -18,7 +29,7 @@ class SourceDipole(object):
         return self._position
 
 
-class SourceTFSF(object):
+class SourceTFSF(Source):
     """
     Total Field/Scattered Field box for plane waves with arbitrary propagation
     direction and temporal shape (Pulse)
