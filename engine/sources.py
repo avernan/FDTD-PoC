@@ -43,18 +43,19 @@ class SourceTFSF(Source):
         self.Z0 = grid.Z0
         self.space = 2
         NP = xs[1] - xs[0] + 2*self.space + 1
-        self._bound_El = grid.get_field('z')._data[xs[0]:xs[0]+1,ys[0]:ys[1]+1]
-        self._bound_Hl = grid.get_field('y')._data[xs[0]-1:xs[0],ys[0]:ys[1]+1]
-        self._bound_Er = grid.get_field('z')._data[xs[1]:xs[1]+1,ys[0]:ys[1]+1]
-        self._bound_Hr = grid.get_field('y')._data[xs[1]:xs[1]+1,ys[0]:ys[1]+1]
+        NP = xs[1] - xs[0] + self.spacel + self.spacer + 1
+        self._bound_El = grid.get_field('z')._data[xs[0],ys[0]:ys[1]+1]
+        self._bound_Hl = grid.get_field('y')._data[xs[0]-1,ys[0]:ys[1]+1]
+        self._bound_Er = grid.get_field('z')._data[xs[1],ys[0]:ys[1]+1]
+        self._bound_Hr = grid.get_field('y')._data[xs[1],ys[0]:ys[1]+1]
 
-        self._bound_Et = grid.get_field('z')._data[xs[0]:xs[1]+1,ys[1]:ys[1]+1]
-        self._bound_Ht = grid.get_field('x')._data[xs[0]:xs[1]+1,ys[1]:ys[1]+1]
-        self._bound_Eb = grid.get_field('z')._data[xs[0]:xs[1]+1,ys[0]:ys[0]+1]
-        self._bound_Hb = grid.get_field('x')._data[xs[0]:xs[1]+1,ys[0]-1:ys[0]]
+        self._bound_Et = grid.get_field('z')._data[xs[0]:xs[1]+1,ys[1]]
+        self._bound_Ht = grid.get_field('x')._data[xs[0]:xs[1]+1,ys[1]]
+        self._bound_Eb = grid.get_field('z')._data[xs[0]:xs[1]+1,ys[0]]
+        self._bound_Hb = grid.get_field('x')._data[xs[0]:xs[1]+1,ys[0]-1]
 
-        self._E = numpy.zeros((NP,1))
-        self._H = numpy.zeros((NP - 1,1))
+        self._E = numpy.zeros(NP)
+        self._H = numpy.zeros(NP - 1)
         return
 
     def update(self, t):
