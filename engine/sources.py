@@ -8,7 +8,7 @@ class Source(object):
     def get_position(self):
         return (0,0)
 
-    def update(self):
+    def update(self, t):
         return
 
 
