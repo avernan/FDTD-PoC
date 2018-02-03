@@ -47,6 +47,7 @@ class SourceTFSF(object):
         return
 
     def update(self, t):
+        #TODO: implement ABC on right end of 1D grid
         self._bound_Hl -= self.C / self.Z0 * self._E[self.space]
         self._bound_Hr += self.C / self.Z0 * self._E[-(self.space+1)]
         self._bound_Hb += self.C / self.Z0 * self._E[self.space:-self.space]
@@ -55,10 +56,10 @@ class SourceTFSF(object):
         self._H += self.C / self.Z0 * (self._E[1:] - self._E[:-1])
         self._E[1:-1] += self.C * self.Z0 * (self._H[1:] - self._H[:-1])
 
-        self._E[0] = self._source(t)
+        self._E[0] = self._source.update(t)
 
-        self._bound_El -= self.C * self*Z0 * self._H[self.space-1]
-        self._bound_Er +=  self.C * self*Z0 * self._H[-self.space]
+        self._bound_El -= self.C * self.Z0 * self._H[self.space-1]
+        self._bound_Er += self.C * self.Z0 * self._H[-self.space]
         return
 
 
