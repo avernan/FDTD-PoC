@@ -133,13 +133,13 @@ class Field(object):
         :return: NoneType
         """
         if self._comp == 0:
-            self._data = self._data - Grid.C / Grid.Z0 * (other[0]._data[:,1:] - other[0]._data[:,:-1])
+            self._data -= Grid.C / Grid.Z0 * (other[0]._data[:,1:] - other[0]._data[:,:-1])
         elif self._comp == 1:
-            self._data = self._data + Grid.C / Grid.Z0 * (other[0]._data[1:,:] - other[0]._data[:-1,:])
+            self._data += Grid.C / Grid.Z0 * (other[0]._data[1:,:] - other[0]._data[:-1,:])
         elif self._comp == 2:
-            self._data[1:-1, 1:-1] = self._data[1:-1, 1:-1] + (
-                - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
-                + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
+            self._data[1:-1, 1:-1] += (
+                    - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
+                    + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
             )
             self._data[0,:] = self._bounds['xm']()
             self._data[-1,:] = self._bounds['xp']()
