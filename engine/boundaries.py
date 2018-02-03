@@ -46,5 +46,5 @@ class ABC(Boundary):
             self._auxfield[1][2,:]
         )
         self._auxfield.pop()
-        self._auxfield.insert(0, numpy.array([update, self._realfield[1,:], self._realfield[2,:]]))
+        self._auxfield.insert(0, numpy.array([update, self._realfield[1,:].copy(), self._realfield[2,:].copy()]))
         return update
