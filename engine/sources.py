@@ -41,8 +41,8 @@ class SourceTFSF(Source):
         self._source = pulse
         self.C = grid.C
         self.Z0 = grid.Z0
-        self.space = 2
-        NP = xs[1] - xs[0] + 2*self.space + 1
+        self.spacel = 2
+        self.spacer = 3
         NP = xs[1] - xs[0] + self.spacel + self.spacer + 1
         self._bound_El = grid.get_field('z')._data[xs[0],ys[0]:ys[1]+1]
         self._bound_Hl = grid.get_field('y')._data[xs[0]-1,ys[0]:ys[1]+1]
@@ -60,18 +60,18 @@ class SourceTFSF(Source):
 
     def update(self, t):
         #TODO: implement ABC on right end of 1D grid
-        self._bound_Hl -= self.C / self.Z0 * self._E[self.space]
-        self._bound_Hr += self.C / self.Z0 * self._E[-(self.space+1)]
-        self._bound_Hb += self.C / self.Z0 * self._E[self.space:-self.space]
-        self._bound_Ht -= self.C / self.Z0 * self._E[self.space:-self.space]
+        self._bound_Hl -= self.C / self.Z0 * self._E[self.spacel]
+        self._bound_Hr += self.C / self.Z0 * self._E[-(self.spacer+1)]
+        self._bound_Hb += self.C / self.Z0 * self._E[self.spacel:-self.spacer]
+        self._bound_Ht -= self.C / self.Z0 * self._E[self.spacel:-self.spacer]
 
         self._H += self.C / self.Z0 * (self._E[1:] - self._E[:-1])
         self._E[1:-1] += self.C * self.Z0 * (self._H[1:] - self._H[:-1])
 
         self._E[0] = self._source.update(t)
 
-        self._bound_El -= self.C * self.Z0 * self._H[self.space-1]
-        self._bound_Er += self.C * self.Z0 * self._H[-self.space]
+        self._bound_El -= self.C * self.Z0 * self._H[self.spacel-1]
+        self._bound_Er += self.C * self.Z0 * self._H[-self.spacer]
         return
 
 
