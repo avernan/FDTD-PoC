@@ -86,4 +86,4 @@ class PulseGaussian(Pulse):
 
     def update(self, t):
         return self.ampl*(numpy.math.exp(-(t - self.mu)**2 / self.tau**2) *
-                          numpy.math.cos(2*numpy.math.pi*self.omega*t))
+                          numpy.math.cos(self.omega*t))
