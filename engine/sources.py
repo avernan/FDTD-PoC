@@ -56,10 +56,16 @@ class SourceTFSF(Source):
 
         self._E = numpy.zeros(NP)
         self._H = numpy.zeros(NP - 1)
+        self._auxfield = [numpy.zeros(3), numpy.zeros(3)]
+
+        t1 = self.C
+        t2 = 1. / t1 + 2. + t1
+        self._coef0 = - (1. / t1 - 2. + t1) / t2
+        self._coef1 = - 2. * (t1 - 1. / t1) / t2
+        self._coef2 = 4. * (t1 + 1. / t1) / t2
         return
 
     def update(self, t):
-        #TODO: implement ABC on right end of 1D grid
         self._bound_Hl -= self.C / self.Z0 * self._E[self.spacel]
         self._bound_Hr += self.C / self.Z0 * self._E[-(self.spacer+1)]
         self._bound_Hb += self.C / self.Z0 * self._E[self.spacel:-self.spacer]
@@ -67,6 +73,13 @@ class SourceTFSF(Source):
 
         self._H += self.C / self.Z0 * (self._E[1:] - self._E[:-1])
         self._E[1:-1] += self.C * self.Z0 * (self._H[1:] - self._H[:-1])
+        self._E[-1] = (
+            self._coef0 * (self._E[-3] + self._auxfield[1][0]) +
+            self._coef1 * (self._auxfield[0][0] + self._auxfield[0][2] - self._E[-2] - self._auxfield[1][1]) +
+            self._coef2 * self._auxfield[0][1] - self._auxfield[1][2]
+        )
+        self._auxfield.pop()
+        self._auxfield.insert(0, self._E[-1:-4:-1].copy())
 
         self._E[0] = self._source.update(t)
 
