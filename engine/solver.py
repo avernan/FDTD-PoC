@@ -99,11 +99,15 @@ class Grid(object):
         self._time = t
         self._Fx.step(t, self._Fz)
         self._Fy.step(t, self._Fz)
+        # Plane wave sources automatically update the relevant fields
+        for src in self._sources:
+            src.update(t)
         self._Fz.step(t, self._Fx, self._Fy)
 
-        for so in self._sources:
-            pos = so.get_position()
-            self._Fz._data[pos[0],pos[1]] += so(t)
+        # Point source have to be manually applied
+        for src in self._sources:
+            self._Fz._data[src.get_position()] += src(t)
+
         return
 
 
