@@ -30,6 +30,7 @@ class Grid(object):
         self._shape_y = (sizex - 1, sizey)
         self._sources = []
         self._bounds = {}
+        self._epsr = numpy.ones(self._shape)
 
         # z component of the field. For TE this is an electric field
         self._Fz = Field(self._shape, field="E", comp=2, bounds=self._bounds)
@@ -102,7 +103,7 @@ class Grid(object):
         # Plane wave sources automatically update the relevant fields
         for src in self._sources:
             src.update(t)
-        self._Fz.step(t, self._Fx, self._Fy)
+        self._Fz.step(t, self._Fx, self._Fy, self._epsr)
 
         # Point source have to be manually applied
         for src in self._sources:
@@ -142,8 +143,8 @@ class Field(object):
             self._data += Grid.C / Grid.Z0 * (other[0]._data[1:,:] - other[0]._data[:-1,:])
         elif self._comp == 2:
             self._data[1:-1, 1:-1] += (
-                    - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
-                    + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
+                    - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1]) / other[2][1:-1,1:-1]
+                    + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1]) / other[2][1:-1,1:-1]
             )
             self._data[0,:] = self._bounds['xm']()
             self._data[-1,:] = self._bounds['xp']()
