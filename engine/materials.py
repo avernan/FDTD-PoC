@@ -6,5 +6,5 @@ class PassiveMaterial(object):
         self.region = (slice(bleft[0], tright[0]), slice(bleft[1], tright[1]))
 
     def build(self):
-        return  self.n * numpy.ones((self.region[0][1] - self.region[0][0],
-                                     self.region[1][1] - self.region[1][0]))
+        return  self.n * numpy.ones((self.region[0][1] - self.region[0][0] + 1,
+                                     self.region[1][1] - self.region[1][0] + 1))
