@@ -1,7 +1,7 @@
 import numpy
 
 class PassiveMaterial(object):
-    def __init__(self, n, bleft=None, tright=None):
+    def __init__(self, n, bleft, tright):
         self.n = n
         self.region = (slice(bleft[0], tright[0]), slice(bleft[1], tright[1]))
 
