@@ -30,6 +30,8 @@ class Grid(object):
         self._shape_y = (sizex - 1, sizey)
         self._sources = []
         self._bounds = {}
+        self._passive_materials = []
+
         self._epsr = numpy.ones(self._shape)
 
         # z component of the field. For TE this is an electric field
@@ -67,6 +69,16 @@ class Grid(object):
         """
         self._sources.append(source)
         return
+
+    def add_passive_material(self, material):
+        """
+        Add a passive material to a region of the simulation
+        """
+        for mat in self._passive_materials:
+            if mat.overlap(material):
+                raise Exception("Error: detected overlap of materials when adding {}".format(material))
+        self._passive_materials.append(material)
+        self._epsr[material.region] = material.build()
 
     def set_boundaries(self, **kwargs):
         # TODO: cleaner implementation required:
