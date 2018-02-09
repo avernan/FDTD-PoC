@@ -30,6 +30,7 @@ class Grid(object):
         self._shape_y = (sizex - 1, sizey)
         self._sources = []
         self._bounds = {}
+        self._materials = []
         self._passive_materials = []
 
         self._epsr = numpy.ones(self._shape)
@@ -74,11 +75,21 @@ class Grid(object):
         """
         Add a passive material to a region of the simulation
         """
-        for mat in self._passive_materials:
+        for mat in self._materials + self._passive_materials:
             if mat.overlap(material):
                 raise Exception("Error: detected overlap of materials when adding {}".format(material))
         self._passive_materials.append(material)
         self._epsr[material.region] = material.build()
+
+    def add_material(self, material, bleft, tright):
+        for mat in self._materials + self._passive_materials:
+            if mat.overlap(material):
+                raise Exception("Error: detected overlap of materials when adding {}".format(material))
+        if material in self._materials:
+            material.add_region(bleft, tright, self)
+        else:
+            self._materials.append(material)
+            material.add_region(bleft, tright, self)
 
     def set_boundaries(self, **kwargs):
         # TODO: cleaner implementation required:
@@ -100,6 +111,8 @@ class Grid(object):
             raise Exception("Grid should have one boundary defined for every side")
         self._built = True
         self.step = self.__step
+        for mat in self._materials:
+            mat.build(self)
 
     def __step(self, t):
         """
@@ -115,7 +128,11 @@ class Grid(object):
         # Plane wave sources automatically update the relevant fields
         for src in self._sources:
             src.update(t)
+        for mat in self._materials:
+            mat.update_current()
         self._Fz.step(t, self._Fx, self._Fy, self._epsr)
+        for mat in self._materials:
+            mat.update_field()
 
         # Point source have to be manually applied
         for src in self._sources:
