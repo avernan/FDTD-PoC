@@ -6,13 +6,8 @@ import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy
 import engine.boundaries as bounds
-from matplotlib.colors import LogNorm
-
 import engine.sources as sources
-
-class SafeLogNorm(LogNorm):
-    def __call__(self, value, clip=None):
-        return LogNorm.__call__(self, value + 1e-20, clip)
+from utilities import SafeLogNorm
 
 shape = (301, 301)
 eff = 0.5
