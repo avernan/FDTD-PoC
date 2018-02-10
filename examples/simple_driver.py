@@ -7,86 +7,76 @@ import matplotlib.pyplot as plt
 import numpy
 import engine.boundaries as bounds
 import engine.sources as sources
-from utilities import SafeLogNorm
 
-shape = (301, 301)
-eff = 0.5
+def to_msec(x):
+    return x.seconds * 1000 + x.microseconds/1000
 
-g = FDTD.Grid(*shape)
+def run(grid, frames=1000):
 
-for i in range(5):
-    pos = numpy.array(shape) * numpy.random.random(2)
-    parms = numpy.random.random(4)
-    g.add_source(
-        sources.SourceDipole(
-            (int(pos[0]), int(pos[1])),
-            sources.PulseGaussian(
-                1 * (1 + eff*parms[0]),
-                300 * (1 + eff*parms[1]),
-                100 * (1 + eff*parms[2]),
-                1/40 * (1 + eff*parms[3])
-            )
-        )
+    fig = plt.figure()
+    plt.subplots_adjust(top=0.8)
+    ax = plt.axes(xlim=(-0.5,shape[0]-0.5), ylim=(-0.5,shape[1]-0.5))
+    ax.set_aspect('equal')
+
+    data = grid.get_field(2)._data
+    im = ax.imshow(numpy.transpose(data), cmap=plt.get_cmap('coolwarm'))
+    plt.colorbar(im, ax=ax)
+
+    time = [dt.now(), dt.now()]
+    elaps_gen = [0] * 50; elaps_rend = [0] * 50
+    txt = "frame {:4d}\nTimes: {:.2f} ms (gen.), {:.2f} ms (rend.)\nFPS: {:.1f}"
+    text0 = ax.text(int(shape[0]/2),int(shape[1]*1.20),
+                    txt.format(0, sum(elaps_gen)/len(elaps_gen), sum(elaps_rend)/len(elaps_rend), 0),
+                    horizontalalignment="center", verticalalignment="top", color="r", fontsize=16)
+
+    def init():
+        data = grid.get_field(2)._data
+        im.set_data(numpy.transpose(data))
+
+    def update(i):
+        time[0] = dt.now()
+        elaps_rend.pop(0)
+        elaps_rend.append(to_msec(time[0] - time[1]))
+        grid.step(i)
+        time[1] = dt.now()
+        elaps_gen.pop(0)
+        elaps_gen.append(to_msec(time[1] - time[0]))
+        data = grid.get_field(2)._data
+        im.set_data(numpy.transpose(data))
+        text0.set_text(txt.format(
+            i, sum(elaps_gen)/len(elaps_gen), sum(elaps_rend)/len(elaps_rend),
+            1000 / (sum(elaps_rend)/len(elaps_rend) + sum(elaps_gen)/len(elaps_gen))
+        ))
+
+    anim = animation.FuncAnimation(
+        fig,
+        update,
+        init_func=init,
+        frames=frames,
+        repeat=False,
+        interval=int(1000/30),
+        blit=False
     )
 
-g.set_boundaries(xm=bounds.PEC(), xp=bounds.PEC(), ym=bounds.PEC(), yp=bounds.PEC())
-g.build()
+    plt.show()
 
-fig = plt.figure()
-plt.subplots_adjust(top=0.8)
-ax = plt.axes(xlim=(-0.5,shape[0]-0.5), ylim=(-0.5,shape[1]-0.5))
-ax.set_aspect('equal')
+if __name__ == '__main__':
+    # Define grid size
+    shape = numpy.array((800, 800))
+    g = FDTD.Grid(*shape)
 
-data = g.get_field(2)._data
-# TODO: smaller value of `vmin` is required to hide ABC reflection on log scale
-im = ax.imshow(numpy.abs(numpy.transpose(data)), cmap=plt.get_cmap('inferno'), norm=SafeLogNorm(vmin=1e-6, vmax=2, clip=True))
-cbar = plt.colorbar(im, ax=ax)
+    # Add sources
+    # In this case a TFSF box with 50 cells spacing on each side
+    buffer = numpy.array((50, 50))
+    g.add_source(sources.SourceTFSF(g, buffer, shape-buffer, sources.PulseGaussian(1, 500, 200, 1/20)))
 
-time = [dt.now(), dt.now()]
-elaps_gen = [0] * 50
-elaps_rend = [0] * 50
-txt = "frame {:4d}\nTimes: {:.2f} ms (gen.), {:.2f} ms (rend.)\nFPS: {:.1f}"
-text0 = ax.text(int(shape[0]/2),int(shape[1]*1.20), txt.format(0, sum(elaps_gen)/len(elaps_gen), sum(elaps_rend)/len(elaps_rend), 0))
-text0.set_horizontalalignment("center")
-text0.set_verticalalignment("top")
-text0.set_color('r')
-text0.set_fontsize(16)
+    # Set boundary conditions
+    # Here absorbing boundaries to simulate an open system
+    g.set_boundaries(xm=bounds.ABC(), xp=bounds.ABC(), ym=bounds.ABC(), yp=bounds.ABC())
 
-# TODO: should avoid transposing data every time. Too easy to forget
-def init():
-    data = g.get_field(2)._data
-    im.set_data(numpy.abs(numpy.transpose(data)))
-    return [im]
+    # Build and validate the FDTD setup
+    g.build()
 
-def update(i):
-    def to_msec(x):
-        return x.seconds * 1000 + x.microseconds/1000
-    time[0] = dt.now()
-    elaps_rend.pop(0)
-    elaps_rend.append(to_msec(time[0] - time[1]))
-    g.step(i)
-    time[1] = dt.now()
-    elaps_gen.pop(0)
-    elaps_gen.append(to_msec(time[1] - time[0]))
-    data = g.get_field(2)._data
-    im.set_data(numpy.abs(numpy.transpose(data)))
-    text0.set_text(txt.format(
-        i,
-        sum(elaps_gen)/len(elaps_gen),
-        sum(elaps_rend)/len(elaps_rend),
-        1000 / (sum(elaps_rend)/len(elaps_rend) + sum(elaps_gen)/len(elaps_gen))
-    ))
-    return [im, text0]
-
-anim = animation.FuncAnimation(
-    fig,
-    update,
-    init_func=init,
-    frames=800,
-    repeat=False,
-    interval=int(1000/30),
-    blit=False
-)
-
-plt.show()
-
+    # Run simulation and animation for nstep steps
+    nsteps = 4000
+    run(g, nsteps)
