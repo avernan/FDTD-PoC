@@ -29,6 +29,7 @@ class Animation(Frame):
     vals = {"frame":0, "FPS":0, "gen":0, "rend":0}
     def __init__(self, grid, nframes=1000):
         super().__init__()
+        self.running = False
         self.elaps_gen = [0] * 50
         self.elaps_rend = [0] * 50
         self.nframes = nframes
@@ -93,16 +94,26 @@ class Animation(Frame):
 
         text_frame.pack()
 
-        self.fig_canvas = FigureCanvasTkAgg(self.fig, master=self)
+        plots = Frame(self)
+        self.fig_canvas = FigureCanvasTkAgg(self.fig, master=plots)
         self.fig_canvas.show()
         self.fig_canvas.get_tk_widget().pack(side=tk.LEFT)
 
-        self.fig_canvas2 = FigureCanvasTkAgg(self.fig2, master=self)
+        self.fig_canvas2 = FigureCanvasTkAgg(self.fig2, master=plots)
         self.fig_canvas2.show()
         self.fig_canvas2.get_tk_widget().pack(side=tk.LEFT)
+        plots.pack()
 
-        start = Button(text="Start FDTD", command=self.run)
-        start.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=False)
+        buttons = Frame(self)
+        self.start = Button(buttons, text="Start FDTD", command=self.run)
+        self.start.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.v_pause = tk.StringVar()
+        self.v_pause.set("---")
+        self.pause_b = Button(buttons, textvariable=self.v_pause, command=self.pause, state="disabled")
+        self.pause_b.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        stop = Button(buttons, text="Stop FDTD", command=self.quit)
+        stop.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+        buttons.pack(side=tk.BOTTOM, fill=tk.BOTH)
 
         self.pack()
 
@@ -143,11 +154,30 @@ class Animation(Frame):
             var.set(txt.format(**Animation.vals))
 
     def run(self):
-        self.anim = animation.FuncAnimation(
-            self.fig, self.step, frames=self.nframes,
-            repeat=False, interval=int(1000/30), blit=False
-        )
-        self.fig_canvas.draw()
+        if not self.running:
+            self.anim = animation.FuncAnimation(
+                self.fig, self.step, frames=self.nframes,
+                repeat=False, interval=int(1000/30), blit=False
+            )
+            self.fig_canvas.draw()
+            self.running = True
+            self.start.config(state="disabled")
+            self.pause_b.config(state="normal")
+            self.v_pause.set("Pause")
+
+    def quit(self):
+        self.anim.event_source.stop()
+        super().quit()
+
+    def pause(self):
+        if self.running:
+            self.anim.event_source.stop()
+            self.v_pause.set("Resume")
+            self.running = False
+        else:
+            self.anim.event_source.start()
+            self.v_pause.set("Pause")
+            self.running = True
 
 if __name__ == '__main__':
     # Define grid size
