@@ -29,8 +29,8 @@ class SourceTFSF(Source):
     """
     Total Field/Scattered Field box for plane waves with arbitrary propagation
     direction and temporal shape (Pulse)
+    TODO: extend to arbitrary phi
     """
-    # TODO: extend to arbitrary phi
     def __init__(self, grid, bleft, tright, pulse,
                  spacel=2, spacer=3):
         super().__init__((bleft, tright), pulse)
