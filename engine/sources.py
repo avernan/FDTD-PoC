@@ -20,9 +20,8 @@ class SourceDipole(Source):
         self._position = pos
         self._source = pulse
 
-    def __call__(self, *args, **kwargs):
-        assert len(args) == 1
-        return self._source.update(args[0])
+    def __call__(self, t):
+        return self._source.update(t)
 
     def get_position(self):
         """Return dipole source position as a tuple"""
