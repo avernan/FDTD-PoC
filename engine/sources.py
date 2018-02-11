@@ -2,11 +2,15 @@ import numpy
 
 
 class Source(object):
+    def __init__(self, position, pulse):
+        self.position = position
+        self.pulse = pulse
+
     def __call__(self, *args, **kwargs):
         return float(0)
 
     def get_position(self):
-        return (0,0)
+        return self.position
 
     def update(self, t):
         return
@@ -16,16 +20,11 @@ class SourceDipole(Source):
     """
     Dipole (additive) sources with arbitrary position and pulse shape
     """
-    def __init__(self, pos, pulse):
-        self._position = pos
-        self._source = pulse
+    def __init__(self, position, pulse):
+        super().__init__(position, pulse)
 
     def __call__(self, t):
-        return self._source.update(t)
-
-    def get_position(self):
-        """Return dipole source position as a tuple"""
-        return self._position
+        return self.pulse.update(t)
 
 
 class SourceTFSF(Source):
@@ -35,9 +34,9 @@ class SourceTFSF(Source):
     """
     # TODO: extend to arbitrary phi
     def __init__(self, grid, bleft, tright, pulse):
+        super().__init__(bleft, pulse)
         xs = [bleft[0], tright[0]]
         ys = [bleft[1], tright[1]]
-        self._source = pulse
         self.C = grid.C
         self.Z0 = grid.Z0
         self.spacel = 2
@@ -80,7 +79,7 @@ class SourceTFSF(Source):
         self._auxfield.pop()
         self._auxfield.insert(0, self._E[-1:-4:-1].copy())
 
-        self._E[0] = self._source.update(t)
+        self._E[0] = self.pulse.update(t)
 
         self._bound_El -= self.C * self.Z0 * self._H[self.spacel-1]
         self._bound_Er += self.C * self.Z0 * self._H[-self.spacer]
