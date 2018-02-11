@@ -17,7 +17,7 @@ class SourceDipole(Source):
         grid.register_step_callback("post", "e", self)
 
     def __call__(self, t):
-        self._field += self.pulse.update(t)
+        self._field += self.pulse(t)
 
     def build(self, grid):
         xpos = slice(self.position[0], self.position[0]+1)
@@ -62,7 +62,7 @@ class SourceTFSF(Source):
         self._auxfield.pop()
         self._auxfield.insert(0, self._E[-1:-4:-1].copy())
 
-        self._E[0] = self.pulse.update(t)
+        self._E[0] = self.pulse(t)
 
         self._bound_El -= self._C * self._Z0 * self._H[self.spacel - 1]
         self._bound_Er += self._C * self._Z0 * self._H[-self.spacer]
@@ -93,7 +93,7 @@ class Pulse(object):
     """
     Abstract pulse class. Subclasses should override the update method
     """
-    def update(self, t):
+    def __call__(self, t):
         """Return value of source at time t"""
         raise NotImplementedError
 
@@ -106,6 +106,6 @@ class PulseGaussian(Pulse):
         self.tau = tau
         self.omega = omega
 
-    def update(self, t):
+    def __call__(self, t):
         return self.ampl*(numpy.math.exp(-(t - self.mu)**2 / self.tau**2) *
                           numpy.math.cos(self.omega*t))
