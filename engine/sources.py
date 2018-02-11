@@ -9,9 +9,6 @@ class Source(object):
     def __call__(self, *args, **kwargs):
         return float(0)
 
-    def get_position(self):
-        return self.position
-
     def update(self, t):
         return
 
