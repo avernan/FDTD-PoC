@@ -35,6 +35,7 @@ class Grid(object):
         self.post_e = {}
         self.pre_h = {}
         self.post_h = {}
+        self.build_callbacks = []
 
         # z component of the field. For TE this is an electric field
         self._Fz = Field(self._shape, field="E", comp=2, bounds=self._bounds)
@@ -44,6 +45,9 @@ class Grid(object):
 
     def __repr__(self):
         return "{}(sizex={}, sizey={})".format("Grid", self._shape[0], self._shape[1])
+
+    def register_build_callback(self, func):
+        self.build_callbacks.append(func)
 
     def register_step_callback(self, time, field, func, priority=0):
         assert time.lower() in ["pre", "post"]
