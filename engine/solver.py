@@ -127,9 +127,6 @@ class Grid(object):
             for callback in self.pre_e[priority]:
                 callback(t)
 
-        for src in self.sources:
-            src.update(t)
-
         self._Fz.step(t, self._Fx, self._Fy)
 
         for priority in sorted(self.post_e.keys(), reverse=True):

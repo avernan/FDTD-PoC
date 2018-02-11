@@ -41,6 +41,7 @@ class SourceTFSF(Source):
                  spacel=2, spacer=3):
         xs = [bleft[0], tright[0]]
         ys = [bleft[1], tright[1]]
+        grid.register_step_callback("pre", "e", self)
         self.C = grid.C
         self.Z0 = grid.Z0
         self.spacel = spacel
@@ -67,7 +68,7 @@ class SourceTFSF(Source):
         self._coef2 = 4. * (t1 + 1. / t1) / t2
         return
 
-    def update(self, t):
+    def __call__(self, t):
         self._bound_Hl -= self.C / self.Z0 * self._E[self.spacel]
         self._bound_Hr += self.C / self.Z0 * self._E[-(self.spacer+1)]
         self._bound_Hb += self.C / self.Z0 * self._E[self.spacel:-self.spacer]
@@ -87,7 +88,6 @@ class SourceTFSF(Source):
 
         self._bound_El -= self.C * self.Z0 * self._H[self.spacel-1]
         self._bound_Er += self.C * self.Z0 * self._H[-self.spacer]
-        return
 
 
 class Pulse(object):
