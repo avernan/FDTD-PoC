@@ -42,12 +42,10 @@ class SourceTFSF(Source):
         super().__init__((bleft, tright), pulse)
         grid.register_build_callback(self.build)
         grid.register_step_callback("pre", "e", self)
-        self.C = grid.C
-        self.Z0 = grid.Z0
         self.spacel = spacel
         self.spacer = spacer
 
-        t1 = self.C
+        t1 = grid.C
         t2 = 1. / t1 + 2. + t1
         self._coef0 = - (1. / t1 - 2. + t1) / t2
         self._coef1 = - 2. * (t1 - 1. / t1) / t2
@@ -55,13 +53,13 @@ class SourceTFSF(Source):
         return
 
     def __call__(self, t):
-        self._bound_Hl -= self.C / self.Z0 * self._E[self.spacel]
-        self._bound_Hr += self.C / self.Z0 * self._E[-(self.spacer+1)]
-        self._bound_Hb += self.C / self.Z0 * self._E[self.spacel:-self.spacer]
-        self._bound_Ht -= self.C / self.Z0 * self._E[self.spacel:-self.spacer]
+        self._bound_Hl -= self._C / self._Z0 * self._E[self.spacel]
+        self._bound_Hr += self._C / self._Z0 * self._E[-(self.spacer + 1)]
+        self._bound_Hb += self._C / self._Z0 * self._E[self.spacel:-self.spacer]
+        self._bound_Ht -= self._C / self._Z0 * self._E[self.spacel:-self.spacer]
 
-        self._H += self.C / self.Z0 * (self._E[1:] - self._E[:-1])
-        self._E[1:-1] += self.C * self.Z0 * (self._H[1:] - self._H[:-1])
+        self._H += self._C / self._Z0 * (self._E[1:] - self._E[:-1])
+        self._E[1:-1] += self._C * self._Z0 * (self._H[1:] - self._H[:-1])
         self._E[-1] = (
             self._coef0 * (self._E[-3] + self._auxfield[1][0]) +
             self._coef1 * (self._auxfield[0][0] + self._auxfield[0][2] - self._E[-2] - self._auxfield[1][1]) +
@@ -72,10 +70,12 @@ class SourceTFSF(Source):
 
         self._E[0] = self.pulse.update(t)
 
-        self._bound_El -= self.C * self.Z0 * self._H[self.spacel-1]
-        self._bound_Er += self.C * self.Z0 * self._H[-self.spacer]
+        self._bound_El -= self._C * self._Z0 * self._H[self.spacel - 1]
+        self._bound_Er += self._C * self._Z0 * self._H[-self.spacer]
 
     def build(self, grid):
+        self._C = grid.C
+        self._Z0 = grid.Z0
         xs = tuple(val[0] for val in self.position)
         ys = tuple(val[1] for val in self.position)
         NP = xs[1] - xs[0] + self.spacel + self.spacer + 1
