@@ -37,14 +37,14 @@ class SourceTFSF(Source):
     direction and temporal shape (Pulse)
     """
     # TODO: extend to arbitrary phi
-    def __init__(self, grid, bleft, tright, pulse):
-        super().__init__(bleft, pulse)
+    def __init__(self, grid, bleft, tright, pulse,
+                 spacel=2, spacer=3):
         xs = [bleft[0], tright[0]]
         ys = [bleft[1], tright[1]]
         self.C = grid.C
         self.Z0 = grid.Z0
-        self.spacel = 2
-        self.spacer = 3
+        self.spacel = spacel
+        self.spacer = spacer
         NP = xs[1] - xs[0] + self.spacel + self.spacer + 1
         self._bound_El = grid.get_field('z')._data[xs[0],ys[0]:ys[1]+1]
         self._bound_Hl = grid.get_field('y')._data[xs[0]-1,ys[0]:ys[1]+1]
