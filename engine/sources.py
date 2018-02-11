@@ -6,9 +6,6 @@ class Source(object):
         self.position = position
         self.pulse = pulse
 
-    def __call__(self, *args, **kwargs):
-        return float(0)
-
 
 class SourceDipole(Source):
     """
