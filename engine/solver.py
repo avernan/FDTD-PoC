@@ -31,6 +31,11 @@ class Grid(object):
         self._sources = []
         self._bounds = {}
 
+        self.pre_e = {}
+        self.post_e = {}
+        self.pre_h = {}
+        self.post_h = {}
+
         # z component of the field. For TE this is an electric field
         self._Fz = Field(self._shape, field="E", comp=2, bounds=self._bounds)
         # x,y components of the field. These are magnetic fields
@@ -39,6 +44,17 @@ class Grid(object):
 
     def __repr__(self):
         return "{}(sizex={}, sizey={})".format("Grid", self._shape[0], self._shape[1])
+
+    def register_step_callback(self, time, field, func, priority=0):
+        assert time.lower() in ["pre", "post"]
+        assert field.lower() in "he" and len(field) == 1
+
+        cbs = getattr(self, '_'.join([time, field]))
+        if priority in cbs.keys():
+            cbs[priority].append(func)
+        else:
+            cbs[priority] = [func]
+
 
     def get_size(self):
         """
@@ -97,12 +113,30 @@ class Grid(object):
         :return: NoneType
         """
         self._time = t
+
+        for priority in sorted(self.pre_h.keys(), reverse=True):
+            for callback in self.pre_h[priority]:
+                callback(t)
+
         self._Fx.step(t, self._Fz)
         self._Fy.step(t, self._Fz)
-        # Plane wave sources automatically update the relevant fields
+
+        for priority in sorted(self.post_h.keys(), reverse=True):
+            for callback in self.post_h[priority]:
+                callback(t)
+
+        for priority in sorted(self.pre_e.keys(), reverse=True):
+            for callback in self.pre_e[priority]:
+                callback(t)
+
         for src in self._sources:
             src.update(t)
+
         self._Fz.step(t, self._Fx, self._Fy)
+
+        for priority in sorted(self.post_e.keys(), reverse=True):
+            for callback in self.post_e[priority]:
+                callback(t)
 
         # Point source have to be manually applied
         for src in self._sources:
