@@ -97,6 +97,8 @@ class Grid(object):
     def build(self):
         if len(self.bounds) != 4:
             raise Exception("Grid should have one boundary defined for every side")
+        for func in self.build_callbacks:
+            func(self)
         self._built = True
         self.step = self.__step
 
