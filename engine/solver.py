@@ -24,12 +24,12 @@ class Grid(object):
         :param sizex: number of mesh points along x
         :param sizey: number of mesh points along y
         """
-        self._time = 0
-        self._shape = (sizex, sizey)
+        self.time = 0
+        self.shape = (sizex, sizey)
         self._shape_x = (sizex, sizey - 1)
         self._shape_y = (sizex - 1, sizey)
-        self._sources = []
-        self._bounds = {}
+        self.sources = []
+        self.bounds = {}
 
         self.pre_e = {}
         self.post_e = {}
@@ -38,13 +38,13 @@ class Grid(object):
         self.build_callbacks = []
 
         # z component of the field. For TE this is an electric field
-        self._Fz = Field(self._shape, field="E", comp=2, bounds=self._bounds)
+        self._Fz = Field(self.shape, field="E", comp=2, bounds=self.bounds)
         # x,y components of the field. These are magnetic fields
         self._Fx = Field(self._shape_x, field="H", comp=0)
         self._Fy = Field(self._shape_y, field="H", comp=1)
 
     def __repr__(self):
-        return "{}(sizex={}, sizey={})".format("Grid", self._shape[0], self._shape[1])
+        return "{}(sizex={}, sizey={})".format("Grid", self.shape[0], self.shape[1])
 
     def register_build_callback(self, func):
         self.build_callbacks.append(func)
@@ -58,14 +58,6 @@ class Grid(object):
             cbs[priority].append(func)
         else:
             cbs[priority] = [func]
-
-
-    def get_size(self):
-        """
-        Get grid size as a tuple
-        :return: (int, int)
-        """
-        return self._shape
 
     def get_field(self, comp):
         """
@@ -84,7 +76,7 @@ class Grid(object):
         :param source: object of type source
         :return: NoneType
         """
-        self._sources.append(source)
+        self.sources.append(source)
         return
 
     def set_boundaries(self, **kwargs):
@@ -93,17 +85,17 @@ class Grid(object):
         #   of layers
         #   * the dictionary implementation is confusing and difficult to handle/expand
         for k, v in kwargs.items():
-            self._bounds[k] = v.build_boundary(
+            self.bounds[k] = v.build_boundary(
                 **{
-                    'xm': {'size': self._shape[1], 'field': self._Fz._data[0:3,:]},
-                    'xp': {'size': self._shape[1], 'field': self._Fz._data[-1:-4:-1,:]},
-                    'ym': {'size': self._shape[0], 'field': numpy.transpose(self._Fz._data[:,0:3])},
-                    'yp': {'size': self._shape[0], 'field': numpy.transpose(self._Fz._data[:,-1:-4:-1])}
+                    'xm': {'size': self.shape[1], 'field': self._Fz._data[0:3, :]},
+                    'xp': {'size': self.shape[1], 'field': self._Fz._data[-1:-4:-1, :]},
+                    'ym': {'size': self.shape[0], 'field': numpy.transpose(self._Fz._data[:, 0:3])},
+                    'yp': {'size': self.shape[0], 'field': numpy.transpose(self._Fz._data[:, -1:-4:-1])}
                 }[k]
             )
 
     def build(self):
-        if len(self._bounds) != 4:
+        if len(self.bounds) != 4:
             raise Exception("Grid should have one boundary defined for every side")
         self._built = True
         self.step = self.__step
@@ -116,7 +108,7 @@ class Grid(object):
         :param src: a tuple indicating position and field for the source
         :return: NoneType
         """
-        self._time = t
+        self.time = t
 
         for priority in sorted(self.pre_h.keys(), reverse=True):
             for callback in self.pre_h[priority]:
@@ -133,7 +125,7 @@ class Grid(object):
             for callback in self.pre_e[priority]:
                 callback(t)
 
-        for src in self._sources:
+        for src in self.sources:
             src.update(t)
 
         self._Fz.step(t, self._Fx, self._Fy)
@@ -143,7 +135,7 @@ class Grid(object):
                 callback(t)
 
         # Point source have to be manually applied
-        for src in self._sources:
+        for src in self.sources:
             self._Fz._data[src.get_position()] += src(t)
 
         return
