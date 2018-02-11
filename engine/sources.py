@@ -20,7 +20,7 @@ class SourceDipole(Source):
     """
     Dipole (additive) sources with arbitrary position and pulse shape
     """
-    def __init__(self, position, pulse, grid):
+    def __init__(self, grid, position, pulse):
         super().__init__(position, pulse)
         grid.register_build_callback(self.build)
         grid.register_step_callback("post", "e", self.call)
