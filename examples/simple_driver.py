@@ -68,8 +68,8 @@ if __name__ == '__main__':
     # Add sources
     # In this case a TFSF box with 50 cells spacing on each side
     buffer = numpy.array((50, 50))
-    g.add_source(sources.SourceTFSF(g, buffer, shape-buffer, sources.PulseGaussian(1, 500, 200, 1/20)))
 
+    sources.SourceTFSF(g, buffer, shape-buffer, sources.PulseGaussian(1, 500, 200, 1/20))
     sources.SourceDipole(g, (600,400), sources.PulseGaussian(10, 300, 100, 1/20))
 
     # Set boundary conditions

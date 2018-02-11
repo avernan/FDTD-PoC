@@ -70,15 +70,6 @@ class Grid(object):
         except TypeError:
             return getattr(self, "_F" + comp)
 
-    def add_source(self, source):
-        """
-        Add a source to the simulation
-        :param source: object of type source
-        :return: NoneType
-        """
-        self.sources.append(source)
-        return
-
     def set_boundaries(self, **kwargs):
         # TODO: cleaner implementation required:
         #   * this should only transpose and/or reverse arrays as different boundary types may require different number
