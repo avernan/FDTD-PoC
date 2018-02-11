@@ -19,7 +19,7 @@ def run(grid, frames=1000):
     ax.set_aspect('equal')
 
     data = grid.get_field(2)._data
-    im = ax.imshow(numpy.transpose(data), cmap=plt.get_cmap('coolwarm'))
+    im = ax.imshow(numpy.transpose(data), cmap=plt.get_cmap('coolwarm'), vmin=-1.05, vmax=1.05)
     plt.colorbar(im, ax=ax)
 
     time = [dt.now(), dt.now()]
