@@ -20,11 +20,21 @@ class SourceDipole(Source):
     """
     Dipole (additive) sources with arbitrary position and pulse shape
     """
-    def __init__(self, position, pulse):
+    def __init__(self, position, pulse, grid):
         super().__init__(position, pulse)
+        grid.register_build_callback(self.build)
+        grid.register_step_callback("post", "e", self.call)
 
     def __call__(self, t):
         return self.pulse.update(t)
+
+    def build(self, grid):
+        xpos = slice(self.position[0], self.position[0]+1)
+        ypos = slice(self.position[1], self.position[1]+1)
+        self._field = grid.get_field("z")._data[xpos,ypos]
+
+    def call(self, t):
+        self._field += self.pulse.update(t)
 
 
 class SourceTFSF(Source):

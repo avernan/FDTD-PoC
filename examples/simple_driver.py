@@ -70,6 +70,8 @@ if __name__ == '__main__':
     buffer = numpy.array((50, 50))
     g.add_source(sources.SourceTFSF(g, buffer, shape-buffer, sources.PulseGaussian(1, 500, 200, 1/20)))
 
+    sources.SourceDipole((600,400), sources.PulseGaussian(10, 300, 100, 1/20),g)
+
     # Set boundary conditions
     # Here absorbing boundaries to simulate an open system
     g.set_boundaries(xm=bounds.ABC(), xp=bounds.ABC(), ym=bounds.ABC(), yp=bounds.ABC())
