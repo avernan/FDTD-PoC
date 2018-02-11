@@ -9,9 +9,6 @@ class Source(object):
     def __call__(self, *args, **kwargs):
         return float(0)
 
-    def update(self, t):
-        return
-
 
 class SourceDipole(Source):
     """
