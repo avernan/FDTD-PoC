@@ -136,10 +136,6 @@ class Grid(object):
             for callback in self.post_e[priority]:
                 callback(t)
 
-        # Point source have to be manually applied
-        for src in self.sources:
-            self._Fz._data[src.get_position()] += src(t)
-
         return
 
 
