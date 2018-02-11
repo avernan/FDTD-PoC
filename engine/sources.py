@@ -23,18 +23,15 @@ class SourceDipole(Source):
     def __init__(self, grid, position, pulse):
         super().__init__(position, pulse)
         grid.register_build_callback(self.build)
-        grid.register_step_callback("post", "e", self.call)
+        grid.register_step_callback("post", "e", self)
 
     def __call__(self, t):
-        return self.pulse.update(t)
+        self._field += self.pulse.update(t)
 
     def build(self, grid):
         xpos = slice(self.position[0], self.position[0]+1)
         ypos = slice(self.position[1], self.position[1]+1)
         self._field = grid.get_field("z")._data[xpos,ypos]
-
-    def call(self, t):
-        self._field += self.pulse.update(t)
 
 
 class SourceTFSF(Source):
