@@ -38,7 +38,7 @@ class Animation(Frame):
         self.tpoints = numpy.arange(0,self.nframes,1)
         self.tdata = numpy.zeros((5,self.nframes), dtype=float) * numpy.nan
 
-        center = numpy.array((int(grid.get_size()[0]/2), int(grid.get_size()[1]/2)), dtype=int)
+        center = numpy.array((int(grid.shape[0]/2), int(grid.shape[1]/2)), dtype=int)
         pm = numpy.array((1,-1), dtype=int)
         self.positions = (center, center + center/2, center + pm*center/2, center - center/2, center - pm*center/2)
         self.positions = tuple((tuple(numpy.int_(i)) for i in self.positions))
@@ -49,8 +49,8 @@ class Animation(Frame):
         CON = 2.54
         self.fig = Figure(figsize=(9.5/CON, 7/CON), dpi=100)
         ax = self.fig.add_subplot(111)
-        ax.set_xlim(-0.5,self.grid.get_size()[0]-0.5)
-        ax.set_ylim(-0.5,self.grid.get_size()[1]-0.5)
+        ax.set_xlim(-0.5,self.grid.shape[0]-0.5)
+        ax.set_ylim(-0.5,self.grid.shape[1]-0.5)
         ax.set_aspect('equal')
         data = self.grid.get_field(2)._data
         self.im = ax.imshow(numpy.abs(numpy.transpose(data)), cmap=plt.get_cmap('inferno'),
@@ -189,17 +189,15 @@ if __name__ == '__main__':
     nsources = 5
     for i in range(nsources):
         parms = numpy.random.random(6)
-        g.add_source(sources.SourceDipole(
-            (int(parms[0]*shape[0]), int(parms[1]*shape[1])),
-            sources.PulseGaussian(1*(1-0.5*parms[2]),
-                                  1000*(1-0.5*parms[3]),
-                                  100*(1-0.5*parms[4]),
-                                  1/20*(1-0.5*parms[5]))
-        ))
+        sources.SourceDipole(g, (int(parms[0]*shape[0]), int(parms[1]*shape[1])),
+                             sources.PulseGaussian(10 * (1 - 0.5*parms[2]),
+                                                   10e-15 * (1 - 0.5*parms[3]),
+                                                   2e-15 * (1 - 0.5*parms[4]),
+                                                   1.8e15 * (1 - 0.5*parms[5])))
 
     # Set boundary conditions
     # Here absorbing boundaries to simulate an open system
-    g.set_boundaries(xm=bounds.ABC(), xp=bounds.ABC(), ym=bounds.ABC(), yp=bounds.ABC())
+    g.set_boundaries(xm=bounds.ABC, xp=bounds.ABC, ym=bounds.ABC, yp=bounds.ABC)
 
     # Build and validate the FDTD setup
     g.build()
