@@ -17,10 +17,8 @@ class Grid(object):
     c = 299792458
     C = 1 / numpy.math.sqrt(2)
     Z0 = 377.0
-    dx = 10e-9
-    dt = -1
 
-    def __init__(self, sizex=101, sizey=101, **kwargs):
+    def __init__(self, sizex=101, sizey=101, dx = 10e-9, **kwargs):
         """
         Initialize all essential components for a simulation on a (sizex x sizey) grid. This is the
         size for the z component of the field. The x (y) component has sizex - 1 (sizey - 1) points
@@ -29,6 +27,8 @@ class Grid(object):
         :param sizey: number of mesh points along y
         """
         self.shape = (sizex, sizey)
+        self._dx = dx
+        self._dt = Grid.C * self.dx / Grid.c
 
         self.sources = []
 
@@ -47,6 +47,19 @@ class Grid(object):
 
     def __repr__(self):
         return "{}(sizex={}, sizey={})".format("Grid", self.shape[0], self.shape[1])
+
+    @property
+    def dt(self):
+        return self._dt
+
+    @property
+    def dx(self):
+        return self._dx
+
+    @dx.setter
+    def dx(self, dx):
+        self._dx = dx
+        self._dt = Grid.C * self.dx / Grid.c
 
     def register_build_callback(self, func):
         self.build_callbacks.append(func)

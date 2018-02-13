@@ -63,14 +63,15 @@ def run(grid, frames=1000):
 if __name__ == '__main__':
     # Define grid size
     shape = numpy.array((800, 800))
-    g = FDTD.Grid(*shape)
+    g = FDTD.Grid(*shape, dx=10e-9)
 
     # Add sources
     # In this case a TFSF box with 50 cells spacing on each side
     buffer = numpy.array((50, 50))
 
-    sources.SourceTFSF(g, buffer, shape-buffer, sources.PulseGaussian(1, 500, 200, 1/20))
-    sources.SourceDipole(g, (600,400), sources.PulseGaussian(10, 300, 100, 1/20))
+    # Plane wave of amplitude 1, duration 10 fs, centered at 1 eV
+    sources.SourceTFSF(g, buffer, shape-buffer, sources.PulseGaussian(1, 30e-15, 10e-15, 1.257e15))
+    sources.SourceDipole(g, (600,400), sources.PulseGaussian(10, 10e-15, 2e-15, 1.8e15))
 
     # Set boundary conditions
     # Here absorbing boundaries to simulate an open system

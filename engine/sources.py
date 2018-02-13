@@ -2,9 +2,13 @@ import numpy
 
 
 class Source(object):
-    def __init__(self, position, pulse):
+    def __init__(self, grid, position, pulse):
+        grid.register_build_callback(self.build)
         self.position = position
         self.pulse = pulse
+
+    def build(self, grid):
+        self.pulse.adimensionalise(grid)
 
 
 class SourceDipole(Source):
@@ -12,14 +16,14 @@ class SourceDipole(Source):
     Dipole (additive) sources with arbitrary position and pulse shape
     """
     def __init__(self, grid, position, pulse):
-        super().__init__(position, pulse)
-        grid.register_build_callback(self.build)
+        super().__init__(grid, position, pulse)
         grid.register_step_callback("post", "e", self)
 
     def __call__(self, t):
         self._field += self.pulse(t)
 
     def build(self, grid):
+        super().build(grid)
         xpos = slice(self.position[0], self.position[0]+1)
         ypos = slice(self.position[1], self.position[1]+1)
         self._field = grid.get_field("z")._data[xpos,ypos]
@@ -33,8 +37,7 @@ class SourceTFSF(Source):
     """
     def __init__(self, grid, bleft, tright, pulse,
                  spacel=2, spacer=3):
-        super().__init__((bleft, tright), pulse)
-        grid.register_build_callback(self.build)
+        super().__init__(grid, (bleft, tright), pulse)
         grid.register_step_callback("pre", "e", self)
         self.spacel = spacel
         self.spacer = spacer
@@ -68,6 +71,7 @@ class SourceTFSF(Source):
         self._bound_Er += self._C * self._Z0 * self._H[-self.spacer]
 
     def build(self, grid):
+        super().build(grid)
         self._C = grid.C
         self._Z0 = grid.Z0
         xs = tuple(val[0] for val in self.position)
@@ -109,3 +113,8 @@ class PulseGaussian(Pulse):
     def __call__(self, t):
         return self.ampl*(numpy.math.exp(-(t - self.mu)**2 / self.tau**2) *
                           numpy.math.cos(self.omega*t))
+
+    def adimensionalise(self, grid):
+        self.mu = self.mu / grid.dt
+        self.tau = self.tau / grid.dt
+        self.omega = self.omega * grid.dt
