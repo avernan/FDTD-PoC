@@ -6,6 +6,7 @@
 ############################################################
 
 import numpy
+from engine.boundaries import PEC
 
 class Grid(object):
     """
@@ -32,7 +33,7 @@ class Grid(object):
         self._shape_x = (sizex, sizey - 1)
         self._shape_y = (sizex - 1, sizey)
         self.sources = []
-        self.bounds = {}
+        self.bounds = {'xm': PEC, 'yp': PEC, 'xp': PEC, 'ym': PEC}
 
         self.pre_e = {}
         self.post_e = {}
@@ -74,25 +75,19 @@ class Grid(object):
             return getattr(self, "_F" + comp)
 
     def set_boundaries(self, **kwargs):
-        # TODO: cleaner implementation required:
-        #   * this should only transpose and/or reverse arrays as different boundary types may require different number
-        #   of layers
-        #   * the dictionary implementation is confusing and difficult to handle/expand
         for k, v in kwargs.items():
-            self.bounds[k] = v.build_boundary(
-                **{
-                    'xm': {'size': self.shape[1], 'field': self._Fz._data[0:3, :]},
-                    'xp': {'size': self.shape[1], 'field': self._Fz._data[-1:-4:-1, :]},
-                    'ym': {'size': self.shape[0], 'field': numpy.transpose(self._Fz._data[:, 0:3])},
-                    'yp': {'size': self.shape[0], 'field': numpy.transpose(self._Fz._data[:, -1:-4:-1])}
-                }[k]
-            )
+            self.bounds[k] = v
 
     def build(self):
         if len(self.bounds) != 4:
             raise Exception("Grid should have one boundary defined for every side")
+
+        for side, bound in self.bounds.items():
+            bound(self, side)
+
         for func in self.build_callbacks:
             func(self)
+
         self._built = True
         self.step = self.__step
 
@@ -164,8 +159,4 @@ class Field(object):
                     - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
                     + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
             )
-            self._data[0,:] = self._bounds['xm']()
-            self._data[-1,:] = self._bounds['xp']()
-            self._data[:,0] = self._bounds['ym']()
-            self._data[:,-1] = self._bounds['yp']()
         return
