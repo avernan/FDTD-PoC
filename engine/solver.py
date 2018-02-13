@@ -1,5 +1,5 @@
 ############################################################
-# Main classes for the FDTDPoC solver classes                 #
+# Main classes for the FDTD solver classes                 #
 #                                                          #
 ############################################################
 #           Copyright (c) 2018 Stefano Guazzotti           #
