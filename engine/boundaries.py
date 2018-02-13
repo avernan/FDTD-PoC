@@ -1,5 +1,4 @@
 import numpy
-from engine.solver import Grid
 
 class Boundary(object):
     def __init__(self):
@@ -24,9 +23,9 @@ class ABC(Boundary):
     Differential equation based absorbing boundary conditions (ABC)
     cf. http://www.eecs.wsu.edu/~schneidj/ufdtd/chap6.pdf eq. 6.32-33
     """
-    def __init__(self):
+    def __init__(self, grid):
         Boundary.__init__(self)
-        t1 = Grid.C
+        t1 = grid.C
         t2 = 1. / t1 + 2. + t1
         self._coef0 = - (1. / t1 - 2. + t1) / t2
         self._coef1 = - 2. * (t1 - 1. / t1) / t2
