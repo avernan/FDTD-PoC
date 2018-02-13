@@ -41,12 +41,6 @@ class Grid(object):
         self.post_h = {}
         self.build_callbacks = []
 
-        # z component of the field. For TE this is an electric field
-        self._Fz = Field(self.shape, field="E", comp=2, bounds=self.bounds)
-        # x,y components of the field. These are magnetic fields
-        self._Fx = Field(self._shape_x, field="H", comp=0)
-        self._Fy = Field(self._shape_y, field="H", comp=1)
-
     def __repr__(self):
         return "{}(sizex={}, sizey={})".format("Grid", self.shape[0], self.shape[1])
 
@@ -81,6 +75,12 @@ class Grid(object):
     def build(self):
         if len(self.bounds) != 4:
             raise Exception("Grid should have one boundary defined for every side")
+
+        # z component of the field. For TE this is an electric field
+        self._Fz = Field(self.shape, field="E", comp=2, bounds=self.bounds)
+        # x,y components of the field. These are magnetic fields
+        self._Fx = Field(self._shape_x, field="H", comp=0)
+        self._Fy = Field(self._shape_y, field="H", comp=1)
 
         for side, bound in self.bounds.items():
             bound(self, side)
