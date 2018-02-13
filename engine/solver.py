@@ -49,6 +49,28 @@ class Grid(object):
         return "{}(sizex={}, sizey={})".format("Grid", self.shape[0], self.shape[1])
 
     @property
+    def Nx(self):
+        return self.shape[0]
+
+    @Nx.setter
+    def Nx(self, Nx):
+        try:
+            self.shape = (int(Nx), self.shape[1])
+        except Exception:
+            pass
+
+    @property
+    def Ny(self):
+        return self.shape[1]
+
+    @Ny.setter
+    def Ny(self, Ny):
+        try:
+            self.shape = (self.shape[0], int(Ny))
+        except Exception:
+            pass
+
+    @property
     def dt(self):
         return self._dt
 
@@ -58,8 +80,12 @@ class Grid(object):
 
     @dx.setter
     def dx(self, dx):
-        self._dx = dx
-        self._dt = Grid.C * self.dx / Grid.c
+        try:
+            self._dx = float(dx)
+        except Exception:
+            pass
+        else:
+            self._dt = Grid.C * self.dx / Grid.c
 
     def register_build_callback(self, func):
         self.build_callbacks.append(func)
