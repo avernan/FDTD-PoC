@@ -20,7 +20,7 @@ class Grid(object):
     dx = 10e-9
     dt = -1
 
-    def __init__(self, sizex=101, sizey=101):
+    def __init__(self, sizex=101, sizey=101, **kwargs):
         """
         Initialize all essential components for a simulation on a (sizex x sizey) grid. This is the
         size for the z component of the field. The x (y) component has sizex - 1 (sizey - 1) points
@@ -28,18 +28,22 @@ class Grid(object):
         :param sizex: number of mesh points along x
         :param sizey: number of mesh points along y
         """
-        self.time = 0
         self.shape = (sizex, sizey)
-        self._shape_x = (sizex, sizey - 1)
-        self._shape_y = (sizex - 1, sizey)
+
         self.sources = []
-        self.bounds = {'xm': PEC, 'yp': PEC, 'xp': PEC, 'ym': PEC}
+
+        self.bounds = {}
+
+        for k,v in kwargs.items():
+            if k in ['xm', 'yp', 'xp', 'ym']:
+                self.bounds[k] = v
+
+        self.build_callbacks = []
 
         self.pre_e = {}
         self.post_e = {}
         self.pre_h = {}
         self.post_h = {}
-        self.build_callbacks = []
 
     def __repr__(self):
         return "{}(sizex={}, sizey={})".format("Grid", self.shape[0], self.shape[1])
@@ -76,11 +80,14 @@ class Grid(object):
         if len(self.bounds) != 4:
             raise Exception("Grid should have one boundary defined for every side")
 
+        shape_x = (self.shape[0], self.shape[1] - 1)
+        shape_y = (self.shape[0] - 1, self.shape[1])
+
         # z component of the field. For TE this is an electric field
         self._Fz = Field(self.shape, field="E", comp=2, bounds=self.bounds)
         # x,y components of the field. These are magnetic fields
-        self._Fx = Field(self._shape_x, field="H", comp=0)
-        self._Fy = Field(self._shape_y, field="H", comp=1)
+        self._Fx = Field(shape_x, field="H", comp=0)
+        self._Fy = Field(shape_y, field="H", comp=1)
 
         for side, bound in self.bounds.items():
             bound(self, side)
@@ -88,6 +95,7 @@ class Grid(object):
         for func in self.build_callbacks:
             func(self)
 
+        self.time = 0
         self._built = True
         self.step = self.__step
 
@@ -128,6 +136,7 @@ class Grid(object):
 class Field(object):
     """
     Class that represents a single field component over the whole grid or a subset of it
+    # TODO next clean up :)
     """
     def __init__(self, shape, field, comp, bounds=None):
         """

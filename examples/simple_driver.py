@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
     # Set boundary conditions
     # Here absorbing boundaries to simulate an open system
-    g.set_boundaries(xm=bounds.ABC(g), xp=bounds.ABC(g), ym=bounds.ABC(g), yp=bounds.ABC(g))
+    g.set_boundaries(xm=bounds.ABC, ym=bounds.ABC, xp=bounds.PEC, yp=bounds.PEC)
 
     # Build and validate the FDTD setup
     g.build()
