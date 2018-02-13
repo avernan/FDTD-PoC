@@ -13,8 +13,11 @@ class Grid(object):
     """
     comps = 'xyz'
     sides = {'x': 1, 'y': 0}
+    c = 299792458
     C = 1 / numpy.math.sqrt(2)
     Z0 = 377.0
+    dx = 10e-9
+    dt = -1
 
     def __init__(self, sizex=101, sizey=101):
         """
