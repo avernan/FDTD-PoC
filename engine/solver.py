@@ -95,7 +95,6 @@ class Grid(object):
             if mat.overlap(material):
                 raise Exception("Error: detected overlap of materials when adding {}".format(material))
         self._passive_materials.append(material)
-        self._epsr[material.region] = material.build()
 
     def set_boundaries(self, **kwargs):
         for k, v in kwargs.items():
