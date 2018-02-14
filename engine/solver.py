@@ -30,6 +30,8 @@ class Grid(object):
         self._dx = dx
         self._dt = Grid.C * self.dx / Grid.c
 
+        self._passive_materials = []
+
         self.sources = []
 
         self.bounds = {}
@@ -85,6 +87,16 @@ class Grid(object):
         except TypeError:
             return getattr(self, "_F" + comp)
 
+    def add_passive_material(self, material):
+        """
+        Add a passive material to a region of the simulation
+        """
+        for mat in self._passive_materials:
+            if mat.overlap(material):
+                raise Exception("Error: detected overlap of materials when adding {}".format(material))
+        self._passive_materials.append(material)
+        self._epsr[material.region] = material.build()
+
     def set_boundaries(self, **kwargs):
         for k, v in kwargs.items():
             self.bounds[k] = v
@@ -98,6 +110,7 @@ class Grid(object):
 
         # z component of the field. For TE this is an electric field
         self._Fz = Field(self.shape, field="E", comp=2, bounds=self.bounds)
+        self._epsr = numpy.ones(self.shape)
         # x,y components of the field. These are magnetic fields
         self._Fx = Field(shape_x, field="H", comp=0)
         self._Fy = Field(shape_y, field="H", comp=1)
@@ -137,7 +150,7 @@ class Grid(object):
             for callback in self.pre_e[priority]:
                 callback(t)
 
-        self._Fz.step(t, self._Fx, self._Fy)
+        self._Fz.step(t, self._Fx, self._Fy, self._epsr)
 
         for priority in sorted(self.post_e.keys(), reverse=True):
             for callback in self.post_e[priority]:
@@ -178,7 +191,7 @@ class Field(object):
             self._data += Grid.C / Grid.Z0 * (other[0]._data[1:,:] - other[0]._data[:-1,:])
         elif self._comp == 2:
             self._data[1:-1, 1:-1] += (
-                    - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1])
-                    + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1])
+                    - Grid.C * Grid.Z0 * (other[0]._data[1:-1, 1:] - other[0]._data[1:-1, :-1]) / other[2][1:-1,1:-1]
+                    + Grid.C * Grid.Z0 * (other[1]._data[1:, 1:-1] - other[1]._data[:-1, 1:-1]) / other[2][1:-1,1:-1]
             )
         return
