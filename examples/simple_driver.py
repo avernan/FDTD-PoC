@@ -13,12 +13,15 @@ from utilities import SafeLogNorm
 def to_msec(x):
     return x.seconds * 1000 + x.microseconds/1000
 
-def run(grid, frames=1000):
+def run(grid, frames=1000, positions=None):
 
     fig = plt.figure()
     plt.subplots_adjust(top=0.8)
     ax = plt.axes(xlim=(-0.5,grid.shape[0]-0.5), ylim=(-0.5,grid.shape[1]-0.5))
     ax.set_aspect('equal')
+
+    if positions is not None:
+        save_data = numpy.zeros((positions.shape[0], frames))
 
     data = grid.get_field(2)._data
     im = ax.imshow(numpy.abs(numpy.transpose(data)), cmap=plt.get_cmap('inferno'),
@@ -59,6 +62,9 @@ def run(grid, frames=1000):
             i, sum(elaps_gen)/len(elaps_gen), sum(elaps_rend)/len(elaps_rend),
             1000 / (sum(elaps_rend)/len(elaps_rend) + sum(elaps_gen)/len(elaps_gen))
         ))
+        if positions is not None:
+            for ind in range(len(positions)):
+                save_data[ind,i] = data[tuple(positions[ind])]
 
     anim = animation.FuncAnimation(
         fig,
@@ -71,6 +77,8 @@ def run(grid, frames=1000):
     )
 
     plt.show()
+    if positions is not None:
+        return save_data
 
 if __name__ == '__main__':
     # Define grid size
@@ -96,6 +104,14 @@ if __name__ == '__main__':
     # Build and validate the FDTD setup
     g.build()
 
+    positions = numpy.array([
+        (400,400),
+        (500,400),
+        (400,500),
+        (300,400),
+        (400,300)
+    ])
+
     # Run simulation and animation for nstep steps
-    nsteps = 4000
-    run(g, nsteps)
+    nsteps = 400
+    fields = run(g, nsteps, positions)
